@@ -1,7 +1,9 @@
 the scrip requires VBcable, python(im using py312), pyttsx3, sounddevice and soundfile
 
-to install the dependencies you can run in the cmd: py -m pip install torchaudio
+to install the dependencies you can run in the cmd: py -m pip install pyttsx3 soundfile sounddevice
 if the comand doesnt work, then try asking chatgpt or putting the error in a search engine
+
+im leaving a .venv() for VScode with the dependencies installed
 
 this program was made using wishtag's STTS(https://github.com/wishtag/speech-to-text-to-speech) + chatgpt
 
