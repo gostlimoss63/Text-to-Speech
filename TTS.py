@@ -1,22 +1,34 @@
 import pyttsx3
-import sounddevice as sd
-import soundfile as sf
+import sounddevice as sd #used for setting the device on wich to play through
+import soundfile as sf #used for creating the soundfile.wav and playing it through the selected device
 import threading
 import msvcrt
 
 engine = pyttsx3.init()
-engine.setProperty('rate', 150)
-engine.setProperty('volume', 1)
+engine.setProperty('rate', 180) #set voice speech speed
+engine.setProperty('volume', 1) #set voice volume
 
-def speak(texto, device_index):
-    arquivo_audio = "TTS.ogg"
+audio_arquive = "TTS.wav" 
 
-    engine.save_to_file(texto, arquivo_audio)
+device1 = 7 #select VB-cable device here
+device2 = 6 #select you speaker/headphone here(for audio playback)
+
+def speak(text, device1, device2):
+    engine.save_to_file(text, audio_arquive)
     engine.runAndWait()
+    data, samplerate = sf.read(audio_arquive)
 
-    data, samplerate = sf.read(arquivo_audio)
-    sd.play(data, samplerate, device=device_index)
-    sd.wait()
+    t1 = threading.Thread(target=play_audio, args=(data, samplerate, device1))
+    t2 = threading.Thread(target=play_audio, args=(data, samplerate, device2))
+
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join()
+
+def play_audio(data, samplerate, device_index):
+    sd.play(data, samplerate, device=device_index, blocking=True, latency=0.1)
 
 def list_devices():
     print("Audio Output Device list")
@@ -32,17 +44,16 @@ def voices():
         print(f"{i}: {voice.name}")
     voice_index = int(msvcrt.getch())
     engine.setProperty('voice', voices[voice_index].id)
-    print ("\nSelected voice",voice_index,f"{voices[voice_index].name}","\n")
+    print("\nSelected voice:", voices[voice_index].name, "\n")
 
 if __name__ == '__main__':
     list_devices()
-    device_index = int(msvcrt.getch())
-    print ("\nSelected device",device_index,"\n")
+    device1 = int(msvcrt.getch())
     voices()
 
     while True:
-        texto = input("> ")
-        if texto.strip(' ,.') == "":
+        text = input("> ")
+        if text.strip(" ,.") == "":
             continue
-        t = threading.Thread(target=speak, args=(texto, device_index))
+        t = threading.Thread(target=speak, args=(text, device1, device2))
         t.start()
